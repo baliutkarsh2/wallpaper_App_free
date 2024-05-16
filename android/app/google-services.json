@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "787615125402",
+    "project_id": "sum1-b6b1d",
+    "storage_bucket": "sum1-b6b1d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:787615125402:android:ea66483f3f43892fb17423",
+        "android_client_info": {
+          "package_name": "com.ub.sum1.sum1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2jxniXLnZdL6iPMsAZ-cjDtKqGM633_w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
