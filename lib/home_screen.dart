@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:gradient_icon/gradient_icon.dart';
 import 'wallpaper_grid.dart';
 import 'favorites_provider.dart';
 import 'image_detail_screen.dart';
-import 'custom_bottom_navigation_bar.dart';
+import 'theme_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -22,96 +24,149 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _selectedIndex == 2 ? '' : _selectedIndex == 1 ? '' : '',
-          style: TextStyle(color: Colors.black),
+          _selectedIndex == 2 ? 'Premium Wallpapers' : _selectedIndex == 1 ? 'Favorites' : 'Free Walls',
+          style: GoogleFonts.montserrat(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.black,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.white, // Set the status bar color to white
-          statusBarIconBrightness: Brightness.dark, // Set the status bar icons to dark
+          statusBarColor: Colors.black,
+          statusBarIconBrightness: Brightness.light,
         ),
-        iconTheme: IconThemeData(color: Colors.black), // Set the AppBar icons to black
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: GradientIcon(
+              icon: Icons.menu,
+              size: 30.0,
+              gradient: LinearGradient(
+                colors: <Color>[
+                  Colors.blue,
+                  Colors.purple,
+                  Colors.pink,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
       ),
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'Menu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
+        child: Container(
+          color: isDarkMode ? Colors.black : Colors.white,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: isDarkMode ? Colors.black : Colors.white,
+                ),
+                margin: EdgeInsets.only(bottom: 0),
+                padding: EdgeInsets.only(left: 16.0, bottom: 16.0),
+                child: Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Text(
+                    'Wallpaper App',
+                    style: GoogleFonts.montserrat(
+                      color: isDarkMode ? Colors.white : Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.home),
-              title: Text('Home'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 0;
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.favorite),
-              title: Text('Favorites'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 1;
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.star),
-              title: Text('Premium'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 2;
-                });
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-              onTap: () {
-                Navigator.pop(context);
-                setState(() {
-                  _selectedIndex = 3;
-                });
-              },
-            ),
-          ],
+              _buildDrawerItem(Icons.home, 'Home', 0, Colors.blue, Color(0xFFE0F7FA), isDarkMode),
+              _buildDrawerItem(Icons.favorite, 'Favorites', 1, Colors.pink, Color(0xFFFFEBEE), isDarkMode),
+              _buildDrawerItem(Icons.star, 'Premium', 2, Colors.amber, Color(0xFFFFF8E1), isDarkMode),
+              _buildDrawerItem(Icons.settings, 'Settings', 3, Colors.green, Color(0xFFE8F5E9), isDarkMode),
+            ],
+          ),
         ),
       ),
       body: IndexedStack(
         index: _selectedIndex,
         children: <Widget>[
-          WallpaperGrid(key: UniqueKey(), folder: 'wallpapers/free', title: 'Wallpaper App'),
+          WallpaperGrid(
+            key: UniqueKey(),
+            folder: 'wallpapers/free',
+            title: 'Wallpaper App',
+            isDarkMode: isDarkMode,
+          ),
           _buildFavoritesPage(),
-          WallpaperGrid(key: UniqueKey(), folder: 'wallpapers/premium', title: 'Premium Wallpapers'),
-          Center(child: Text('Settings')),
+          WallpaperGrid(
+            key: UniqueKey(),
+            folder: 'wallpapers/premium',
+            title: 'Premium Wallpapers',
+            isDarkMode: isDarkMode,
+          ),
+          _buildSettingsPage(context),
         ],
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        type: BottomNavigationBarType.fixed,
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Colors.blue),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite, color: Colors.pink),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.star, color: Colors.amber),
+            label: 'Premium',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings, color: Colors.green),
+            label: 'Settings',
+          ),
+        ],
+        selectedLabelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
       ),
     );
   }
 
+  Widget _buildDrawerItem(IconData icon, String title, int index, Color selectedColor, Color bubbleColor, bool isDarkMode) {
+    return ListTile(
+      leading: Icon(icon, color: _selectedIndex == index ? selectedColor : (isDarkMode ? Colors.white : Colors.black)),
+      title: Container(
+        decoration: BoxDecoration(
+          color: _selectedIndex == index ? bubbleColor : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        child: Text(
+          title,
+          style: GoogleFonts.montserrat(
+            color: _selectedIndex == index ? selectedColor : (isDarkMode ? Colors.white : Colors.black),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+      onTap: () {
+        Navigator.pop(context);
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
+    );
+  }
+
   Widget _buildFavoritesPage() {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -119,9 +174,10 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(16.0),
           child: Text(
             'Favorites',
-            style: TextStyle(
-              fontSize: 35,
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
             ),
           ),
         ),
@@ -134,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<FavoritesProvider>(
       builder: (context, favoritesProvider, child) {
         if (favoritesProvider.favorites.isEmpty) {
-          return Center(child: Text('No favorites yet'));
+          return Center(child: Text('No favorites yet', style: GoogleFonts.montserrat()));
         } else {
           return GridView.builder(
             padding: const EdgeInsets.all(8.0),
@@ -142,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
               crossAxisCount: 2,
               crossAxisSpacing: 4.0,
               mainAxisSpacing: 4.0,
-              childAspectRatio: 3 / 4,
+              childAspectRatio: 9 / 16,
             ),
             itemCount: favoritesProvider.favorites.length,
             itemBuilder: (context, index) {
@@ -178,6 +234,41 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildSettingsPage(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Text(
+            'Settings',
+            style: GoogleFonts.montserrat(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
+        SwitchListTile(
+          title: Text(
+            'Dark Theme',
+            style: GoogleFonts.montserrat(
+              fontWeight: FontWeight.bold,
+              color: isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          value: themeProvider.isDarkMode,
+          onChanged: (bool value) {
+            themeProvider.toggleTheme(value);
+          },
+        ),
+      ],
     );
   }
 }
