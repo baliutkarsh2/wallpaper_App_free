@@ -12,12 +12,14 @@ class WallpaperGrid extends StatefulWidget {
   final Key key;
   final String title;
   final bool isDarkMode;
+  final bool showSubtitle;
 
   WallpaperGrid({
     required this.folder,
     required this.key,
     required this.title,
     required this.isDarkMode,
+    this.showSubtitle = false,
   }) : super(key: key);
 
   @override
@@ -39,55 +41,56 @@ class _WallpaperGridState extends State<WallpaperGrid> {
       backgroundColor: widget.isDarkMode ? Colors.black : Colors.white,
       body: CustomScrollView(
         slivers: <Widget>[
-          SliverAppBar(
-            expandedHeight: 90.0,
-            pinned: true,
-            backgroundColor: widget.isDarkMode ? Colors.black : Colors.white,
-            flexibleSpace: LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) {
-                final top = constraints.biggest.height;
-                final showSubtitle = top > 60;
-                return FlexibleSpaceBar(
-                  centerTitle: true,
-                  title: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GradientText(
-                        widget.title,
-                        style: GoogleFonts.montserrat(
-                          fontSize: 24.0,
-                          fontWeight: FontWeight.bold,
+          if (widget.showSubtitle)
+            SliverAppBar(
+              expandedHeight: 90.0,
+              pinned: true,
+              backgroundColor: widget.isDarkMode ? Colors.black : Colors.white,
+              flexibleSpace: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints constraints) {
+                  final top = constraints.biggest.height;
+                  final showSubtitle = top > 60;
+                  return FlexibleSpaceBar(
+                    centerTitle: true,
+                    title: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GradientText(
+                          widget.title,
+                          style: GoogleFonts.montserrat(
+                            fontSize: 24.0,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          colors: [
+                            Colors.blue,
+                            Colors.purple,
+                            Colors.pink,
+                          ],
                         ),
-                        colors: [
-                          Colors.blue,
-                          Colors.purple,
-                          Colors.pink,
-                        ],
-                      ),
-                      SizedBox(height: 4), // Added line spacing
-                      AnimatedOpacity(
-                        opacity: showSubtitle ? 1.0 : 0.0,
-                        duration: Duration(milliseconds: 300),
-                        child: Visibility(
-                          visible: showSubtitle,
-                          child: Text(
-                            "Humongous collection of 2500+ Wallpapers!",
-                            style: GoogleFonts.montserrat(
-                              color: widget.isDarkMode ? Colors.white54 : Colors.black54,
-                              fontSize: 10.0,
+                        SizedBox(height: 4),
+                        AnimatedOpacity(
+                          opacity: showSubtitle ? 1.0 : 0.0,
+                          duration: Duration(milliseconds: 300),
+                          child: Visibility(
+                            visible: showSubtitle,
+                            child: Text(
+                              "Humongous collection of 2500+ Wallpapers!",
+                              style: GoogleFonts.montserrat(
+                                color: widget.isDarkMode ? Colors.white54 : Colors.black54,
+                                fontSize: 10.0,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  background: Container(
-                    color: widget.isDarkMode ? Colors.black : Colors.white,
-                  ),
-                );
-              },
+                      ],
+                    ),
+                    background: Container(
+                      color: widget.isDarkMode ? Colors.black : Colors.white,
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
           SliverPadding(
             padding: EdgeInsets.all(16.0),
             sliver: FutureBuilder<List<Wallpaper>>(
@@ -103,12 +106,12 @@ class _WallpaperGridState extends State<WallpaperGrid> {
                           shrinkWrap: true,
                           physics: NeverScrollableScrollPhysics(),
                           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // Number of columns
+                            crossAxisCount: 2,
                             crossAxisSpacing: 4.0,
                             mainAxisSpacing: 4.0,
-                            childAspectRatio: 3 / 4, // Aspect ratio for rectangles with longer height
+                            childAspectRatio: 3 / 4,
                           ),
-                          itemCount: 8, // Number of shimmer placeholders
+                          itemCount: 8,
                           itemBuilder: (context, index) => Container(
                             margin: EdgeInsets.all(8.0),
                             color: widget.isDarkMode ? Colors.black : Colors.white,
@@ -128,10 +131,10 @@ class _WallpaperGridState extends State<WallpaperGrid> {
                 } else {
                   return SliverGrid(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // Number of columns
+                      crossAxisCount: 2,
                       crossAxisSpacing: 4.0,
                       mainAxisSpacing: 4.0,
-                      childAspectRatio: 3 / 4, // Aspect ratio for rectangles with longer height
+                      childAspectRatio: 3 / 4,
                     ),
                     delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {

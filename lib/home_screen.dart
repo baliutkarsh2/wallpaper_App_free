@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_icon/gradient_icon.dart';
+import 'package:shimmer/shimmer.dart';
 import 'wallpaper_grid.dart';
 import 'favorites_provider.dart';
 import 'image_detail_screen.dart';
@@ -22,6 +23,12 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _navigateToPremium() {
+    setState(() {
+      _selectedIndex = 2;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -30,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _selectedIndex == 2 ? 'Premium Wallpapers' : _selectedIndex == 1 ? 'Favorites' : 'Free Walls',
+          _selectedIndex == 2 ? 'Premium' : _selectedIndex == 1 ? 'Favorites' : 'Free Walls',
           style: GoogleFonts.montserrat(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.black,
@@ -57,6 +64,28 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
+        actions: [
+          GestureDetector(
+            onTap: _navigateToPremium,
+            child: Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.only(right: 4),
+              padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+              child: Shimmer.fromColors(
+                baseColor: Colors.amber,
+                highlightColor: Colors.white,
+                child: Text(
+                  'Premium⭐',
+                  style: GoogleFonts.montserrat(
+                    color: Colors.amber,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
       drawer: Drawer(
         child: Container(
@@ -98,13 +127,15 @@ class _HomeScreenState extends State<HomeScreen> {
             folder: 'wallpapers/free',
             title: 'Wallpaper App',
             isDarkMode: isDarkMode,
+            showSubtitle: true,
           ),
           _buildFavoritesPage(),
           WallpaperGrid(
             key: UniqueKey(),
             folder: 'wallpapers/premium',
-            title: 'Premium Wallpapers',
+            title: '',
             isDarkMode: isDarkMode,
+            showSubtitle: false,
           ),
           _buildSettingsPage(context),
         ],
@@ -164,26 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildFavoritesPage() {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    final isDarkMode = themeProvider.isDarkMode;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Favorites',
-            style: GoogleFonts.montserrat(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
-            ),
-          ),
-        ),
-        Expanded(child: _buildFavoritesGrid()),
-      ],
-    );
+    return _buildFavoritesGrid();
   }
 
   Widget _buildFavoritesGrid() {
