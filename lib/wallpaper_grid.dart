@@ -43,13 +43,13 @@ class _WallpaperGridState extends State<WallpaperGrid> {
         slivers: <Widget>[
           if (widget.showSubtitle)
             SliverAppBar(
-              expandedHeight: 90.0,
+              expandedHeight: 100.0,
               pinned: true,
               backgroundColor: widget.isDarkMode ? Colors.black : Colors.white,
               flexibleSpace: LayoutBuilder(
                 builder: (BuildContext context, BoxConstraints constraints) {
                   final top = constraints.biggest.height;
-                  final showSubtitle = top > 60;
+                  final showSubtitle = top > 70;
                   return FlexibleSpaceBar(
                     centerTitle: true,
                     title: Column(
@@ -109,7 +109,7 @@ class _WallpaperGridState extends State<WallpaperGrid> {
                             crossAxisCount: 2,
                             crossAxisSpacing: 4.0,
                             mainAxisSpacing: 4.0,
-                            childAspectRatio: 3 / 4,
+                            childAspectRatio: 9 / 16,
                           ),
                           itemCount: 8,
                           itemBuilder: (context, index) => Container(
@@ -134,7 +134,7 @@ class _WallpaperGridState extends State<WallpaperGrid> {
                       crossAxisCount: 2,
                       crossAxisSpacing: 4.0,
                       mainAxisSpacing: 4.0,
-                      childAspectRatio: 3 / 4,
+                      childAspectRatio: 9 / 16,
                     ),
                     delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {

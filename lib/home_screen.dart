@@ -8,6 +8,7 @@ import 'wallpaper_grid.dart';
 import 'favorites_provider.dart';
 import 'image_detail_screen.dart';
 import 'theme_provider.dart';
+import 'package:url_launcher/url_launcher.dart'; // Add this import for launching URL
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -25,8 +26,89 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _navigateToPremium() {
     setState(() {
-      _selectedIndex = 2;
+      _selectedIndex = 1;
     });
+  }
+
+  Future<void> _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  void _showGoPremiumDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Colors.black.withOpacity(0.3),
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Go',
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Shimmer.fromColors(
+                  baseColor: Colors.amber,
+                  highlightColor: Colors.white,
+                  child: Text(
+                    'Premium',
+                    style: GoogleFonts.montserrat(
+                      color: Colors.amber,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Get access to our extensive gallery of 400+ Premium Wallpapers ad-free!',
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => _launchURL('https://www.google.com'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.amber,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
+                  ),
+                  child: Text(
+                    'Buy now for \$1',
+                    style: GoogleFonts.montserrat(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -37,45 +119,54 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _selectedIndex == 2 ? 'Premium' : _selectedIndex == 1 ? 'Favorites' : 'Free Walls',
-          style: GoogleFonts.montserrat(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.black,
-        elevation: 0,
-        systemOverlayStyle: SystemUiOverlayStyle(
-          statusBarColor: Colors.black,
-          statusBarIconBrightness: Brightness.light,
-        ),
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: GradientIcon(
-              icon: Icons.menu,
-              size: 30.0,
-              gradient: LinearGradient(
-                colors: <Color>[
-                  Colors.blue,
-                  Colors.purple,
-                  Colors.pink,
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            onPressed: () => Scaffold.of(context).openDrawer(),
+          _selectedIndex == 1
+              ? 'Premium Wallpapers'
+              : _selectedIndex == 2
+              ? 'Favorites'
+              : '',
+          style: GoogleFonts.montserrat(
+            color: isDarkMode ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        backgroundColor: isDarkMode ? Colors.black : Colors.white,
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: isDarkMode ? Colors.black : Colors.white,
+          statusBarIconBrightness: isDarkMode ? Brightness.light : Brightness
+              .dark,
+        ),
+        leading: Builder(
+          builder: (context) =>
+              IconButton(
+                icon: GradientIcon(
+                  icon: Icons.menu,
+                  size: 30.0,
+                  gradient: LinearGradient(
+                    colors: <Color>[
+                      Colors.blue,
+                      Colors.purple,
+                      Colors.pink,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                onPressed: () => Scaffold.of(context).openDrawer(),
+              ),
+        ),
         actions: [
-          GestureDetector(
-            onTap: _navigateToPremium,
+          if (_selectedIndex != 1) GestureDetector(
+            onTap: _showGoPremiumDialog,
             child: Container(
               alignment: Alignment.center,
-              margin: EdgeInsets.only(right: 4),
+              margin: EdgeInsets.only(right: 10),
               padding: EdgeInsets.symmetric(horizontal: 4, vertical: 1),
               child: Shimmer.fromColors(
                 baseColor: Colors.amber,
                 highlightColor: Colors.white,
                 child: Text(
-                  'Premium⭐',
+                  'PRO⭐',
                   style: GoogleFonts.montserrat(
                     color: Colors.amber,
                     fontWeight: FontWeight.bold,
@@ -111,10 +202,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              _buildDrawerItem(Icons.home, 'Home', 0, Colors.blue, Color(0xFFE0F7FA), isDarkMode),
-              _buildDrawerItem(Icons.favorite, 'Favorites', 1, Colors.pink, Color(0xFFFFEBEE), isDarkMode),
-              _buildDrawerItem(Icons.star, 'Premium', 2, Colors.amber, Color(0xFFFFF8E1), isDarkMode),
-              _buildDrawerItem(Icons.settings, 'Settings', 3, Colors.green, Color(0xFFE8F5E9), isDarkMode),
+              _buildDrawerItem(
+                  Icons.home_rounded, 'Home', 0, Colors.blue, Color(0xFFE0F7FA),
+                  isDarkMode),
+              _buildDrawerItem(
+                  Icons.star_rounded, 'Premium', 1, Colors.amber, Color(0xFFFFF8E1),
+                  isDarkMode),
+              _buildDrawerItem(Icons.favorite_rounded, 'Favorites', 2, Colors.pink,
+                  Color(0xFFFFEBEE), isDarkMode),
+              _buildDrawerItem(Icons.settings_rounded, 'Settings', 3, Colors.green,
+                  Color(0xFFE8F5E9), isDarkMode),
+
             ],
           ),
         ),
@@ -129,7 +227,6 @@ class _HomeScreenState extends State<HomeScreen> {
             isDarkMode: isDarkMode,
             showSubtitle: true,
           ),
-          _buildFavoritesPage(),
           WallpaperGrid(
             key: UniqueKey(),
             folder: 'wallpapers/premium',
@@ -137,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
             isDarkMode: isDarkMode,
             showSubtitle: false,
           ),
+          _buildFavoritesPage(),
           _buildSettingsPage(context),
         ],
       ),
@@ -146,31 +244,61 @@ class _HomeScreenState extends State<HomeScreen> {
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.blue),
+            icon: Icon(
+              Icons.home_rounded,
+              color: _selectedIndex == 0
+                  ? Colors.blue
+                  : (isDarkMode ? Colors.white : Colors.black),
+            ),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite, color: Colors.pink),
-            label: 'Favorites',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.star, color: Colors.amber),
+            icon: Icon(
+              Icons.star_rounded,
+              color: _selectedIndex == 1
+                  ? Colors.amber
+                  : (isDarkMode ? Colors.white : Colors.black),
+            ),
             label: 'Premium',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings, color: Colors.green),
+            icon: Icon(
+              Icons.favorite_rounded,
+              color: _selectedIndex == 2
+                  ? Colors.pink
+                  : (isDarkMode ? Colors.white : Colors.black),
+            ),
+            label: 'Favorites',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.settings_rounded,
+              color: _selectedIndex == 3
+                  ? Colors.green
+                  : (isDarkMode ? Colors.white : Colors.black),
+            ),
             label: 'Settings',
           ),
         ],
-        selectedLabelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
-        unselectedLabelStyle: GoogleFonts.montserrat(fontWeight: FontWeight.bold),
+        selectedItemColor: _selectedIndex == 0
+            ? Colors.blue
+            : _selectedIndex == 1
+            ? Colors.amber
+            : _selectedIndex == 2
+            ? Colors.pink
+            : Colors.green,
+        selectedLabelStyle: GoogleFonts.montserrat(),
+        unselectedLabelStyle: GoogleFonts.montserrat(),
       ),
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String title, int index, Color selectedColor, Color bubbleColor, bool isDarkMode) {
+  Widget _buildDrawerItem(IconData icon, String title, int index,
+      Color selectedColor, Color bubbleColor, bool isDarkMode) {
     return ListTile(
-      leading: Icon(icon, color: _selectedIndex == index ? selectedColor : (isDarkMode ? Colors.white : Colors.black)),
+      leading: Icon(icon,
+          color: _selectedIndex == index ? selectedColor : (isDarkMode ? Colors
+              .white : Colors.black)),
       title: Container(
         decoration: BoxDecoration(
           color: _selectedIndex == index ? bubbleColor : Colors.transparent,
@@ -180,7 +308,9 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Text(
           title,
           style: GoogleFonts.montserrat(
-            color: _selectedIndex == index ? selectedColor : (isDarkMode ? Colors.white : Colors.black),
+            color: _selectedIndex == index ? selectedColor : (isDarkMode
+                ? Colors.white
+                : Colors.black),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -195,14 +325,17 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildFavoritesPage() {
-    return _buildFavoritesGrid();
+    return Scaffold(
+      body: _buildFavoritesGrid(),
+    );
   }
 
   Widget _buildFavoritesGrid() {
     return Consumer<FavoritesProvider>(
       builder: (context, favoritesProvider, child) {
         if (favoritesProvider.favorites.isEmpty) {
-          return Center(child: Text('No favorites yet', style: GoogleFonts.montserrat()));
+          return Center(child: Text('No favorites yet',
+              style: GoogleFonts.montserrat(color: Colors.black)));
         } else {
           return GridView.builder(
             padding: const EdgeInsets.all(8.0),
@@ -220,7 +353,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ImageDetailScreen(imageUrl: imageUrl),
+                      builder: (context) =>
+                          ImageDetailScreen(imageUrl: imageUrl),
                     ),
                   );
                 },
@@ -237,7 +371,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (loadingProgress == null) return child;
                         return Center(child: CircularProgressIndicator());
                       },
-                      errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.error),
                     ),
                   ),
                 ),
@@ -253,34 +388,126 @@ class _HomeScreenState extends State<HomeScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final isDarkMode = themeProvider.isDarkMode;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Settings',
-            style: GoogleFonts.montserrat(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Text(
+              'Settings',
+              style: GoogleFonts.montserrat(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
           ),
-        ),
-        SwitchListTile(
-          title: Text(
-            'Dark Theme',
-            style: GoogleFonts.montserrat(
-              fontWeight: FontWeight.bold,
-              color: isDarkMode ? Colors.white : Colors.black,
+          SwitchListTile(
+            title: Text(
+              'Dark Theme',
+              style: GoogleFonts.montserrat(
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+            value: themeProvider.isDarkMode,
+            onChanged: (bool value) {
+              themeProvider.toggleTheme(value);
+            },
+          ),
+          ListTile(
+            title: Text(
+              'Rate the app',
+              style: GoogleFonts.montserrat(
+                color: isDarkMode ? Colors.white : Colors.black,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            onTap: () => _launchURL('https://www.google.com'),
+          ),
+          ListTile(
+            title: Text(
+              'Privacy Policy',
+              style: GoogleFonts.montserrat(
+                color: isDarkMode ? Colors.white : Colors.black,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            onTap: () => _launchURL('https://www.google.com'),
+          ),
+          ListTile(
+            title: Text(
+              'Terms of Use',
+              style: GoogleFonts.montserrat(
+                color: isDarkMode ? Colors.white : Colors.black,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+            onTap: () => _launchURL('https://www.google.com'),
+          ),
+          Container(
+            margin: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Go',
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Shimmer.fromColors(
+                  baseColor: Colors.amber,
+                  highlightColor: Colors.white,
+                  child: Text(
+                    'Premium',
+                    style: GoogleFonts.montserrat(
+                      color: Colors.amber,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'Get access to our extensive gallery of 400+ Premium Wallpapers ad-free!',
+                  style: GoogleFonts.montserrat(
+                    color: Colors.white,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => _launchURL('https://www.google.com'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.amber,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 12.0),
+                  ),
+                  child: Text(
+                    'Buy now for \$1',
+                    style: GoogleFonts.montserrat(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          value: themeProvider.isDarkMode,
-          onChanged: (bool value) {
-            themeProvider.toggleTheme(value);
-          },
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
