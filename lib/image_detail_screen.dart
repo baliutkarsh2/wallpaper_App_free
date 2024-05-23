@@ -252,7 +252,7 @@ class ImageDetailScreen extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () => _showSetWallpaperDialog(context),
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
+                      backgroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20.0),
                       ),

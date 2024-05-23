@@ -36,7 +36,7 @@ class PremiumScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: _launchURL,
               style: ElevatedButton.styleFrom(
-                primary: Colors.amber,
+                backgroundColor: Colors.amber,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),

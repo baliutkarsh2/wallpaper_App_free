@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gradient_icon/gradient_icon.dart';
@@ -37,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       throw 'Could not launch $url';
     }
   }
+
 
   void _showGoPremiumDialog() {
     showDialog(
@@ -78,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Get access to our extensive gallery of 400+ Premium Wallpapers ad-free!',
+                  'Get access to our extensive gallery of 400+ Premium Wallpapers',
                   style: GoogleFonts.montserrat(
                     color: Colors.white,
                   ),
@@ -86,9 +88,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => _launchURL('https://www.google.com'),
+                  onPressed: () => _launchURL('https://play.google.com/store/apps/details?id=com.ub.sum1.sum1'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.amber,
+                    backgroundColor: Colors.amber,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
@@ -193,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Align(
                   alignment: Alignment.bottomLeft,
                   child: Text(
-                    'Wallpaper App',
+                    'WalleX',
                     style: GoogleFonts.montserrat(
                       color: isDarkMode ? Colors.white : Colors.black,
                       fontSize: 20,
@@ -212,7 +214,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   Color(0xFFFFEBEE), isDarkMode),
               _buildDrawerItem(Icons.settings_rounded, 'Settings', 3, Colors.green,
                   Color(0xFFE8F5E9), isDarkMode),
-
+              ListTile(
+                leading: Icon(Icons.privacy_tip_rounded, color: isDarkMode ? Colors.white : Colors.black),
+                title: Text(
+                  '    Privacy Policy',
+                  style: GoogleFonts.montserrat(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () => _launchURL('https://sites.google.com/view/wallex-app/privacy-policy'),
+              ),
+              ListTile(
+                leading: Icon(Icons.link, color: isDarkMode ? Colors.white : Colors.black),
+                title: Text(
+                  '    Terms of Use',
+                  style: GoogleFonts.montserrat(
+                    color: isDarkMode ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onTap: () => _launchURL('https://sites.google.com/view/wallex-app/terms-of-use'),
+              ),
             ],
           ),
         ),
@@ -223,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
           WallpaperGrid(
             key: UniqueKey(),
             folder: 'wallpapers/free',
-            title: 'Wallpaper App',
+            title: 'WalleX',
             isDarkMode: isDarkMode,
             showSubtitle: true,
           ),
@@ -234,7 +257,7 @@ class _HomeScreenState extends State<HomeScreen> {
             isDarkMode: isDarkMode,
             showSubtitle: false,
           ),
-          _buildFavoritesPage(),
+          _buildFavoritesPage(isDarkMode),
           _buildSettingsPage(context),
         ],
       ),
@@ -324,18 +347,24 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFavoritesPage() {
+  Widget _buildFavoritesPage(bool isDarkMode) {
     return Scaffold(
-      body: _buildFavoritesGrid(),
+      body: _buildFavoritesGrid(isDarkMode),
     );
   }
 
-  Widget _buildFavoritesGrid() {
+  Widget _buildFavoritesGrid(bool isDarkMode) {
     return Consumer<FavoritesProvider>(
       builder: (context, favoritesProvider, child) {
         if (favoritesProvider.favorites.isEmpty) {
-          return Center(child: Text('No favorites yet',
-              style: GoogleFonts.montserrat(color: Colors.black)));
+          return Center(
+            child: Text(
+              'No favorites yet',
+              style: GoogleFonts.montserrat(
+                color: isDarkMode ? Colors.white : Colors.black,
+              ),
+            ),
+          );
         } else {
           return GridView.builder(
             padding: const EdgeInsets.all(8.0),
@@ -353,8 +382,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          ImageDetailScreen(imageUrl: imageUrl),
+                      builder: (context) => ImageDetailScreen(imageUrl: imageUrl),
                     ),
                   );
                 },
@@ -371,8 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (loadingProgress == null) return child;
                         return Center(child: CircularProgressIndicator());
                       },
-                      errorBuilder: (context, error, stackTrace) =>
-                          Icon(Icons.error),
+                      errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
                     ),
                   ),
                 ),
@@ -383,6 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
       },
     );
   }
+
 
   Widget _buildSettingsPage(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
@@ -418,23 +446,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           ListTile(
             title: Text(
-              'Rate the app',
-              style: GoogleFonts.montserrat(
-                color: isDarkMode ? Colors.white : Colors.black,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-            onTap: () => _launchURL('https://www.google.com'),
-          ),
-          ListTile(
-            title: Text(
               'Privacy Policy',
               style: GoogleFonts.montserrat(
                 color: isDarkMode ? Colors.white : Colors.black,
                 decoration: TextDecoration.underline,
               ),
             ),
-            onTap: () => _launchURL('https://www.google.com'),
+            onTap: () => _launchURL('https://sites.google.com/view/wallex-app/privacy-policy'),
           ),
           ListTile(
             title: Text(
@@ -444,7 +462,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: TextDecoration.underline,
               ),
             ),
-            onTap: () => _launchURL('https://www.google.com'),
+            onTap: () => _launchURL('https://sites.google.com/view/wallex-app/terms-of-use'),
           ),
           Container(
             margin: EdgeInsets.all(16.0),
@@ -478,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 10),
                 Text(
-                  'Get access to our extensive gallery of 400+ Premium Wallpapers ad-free!',
+                  'Get access to our extensive gallery of 400+ Premium Wallpapers',
                   style: GoogleFonts.montserrat(
                     color: Colors.white,
                   ),
@@ -486,9 +504,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: () => _launchURL('https://www.google.com'),
+                  onPressed: () => _launchURL('https://play.google.com/store/apps/details?id=com.ub.sum1.sum1'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.amber,
+                    backgroundColor: Colors.amber,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20.0),
                     ),
